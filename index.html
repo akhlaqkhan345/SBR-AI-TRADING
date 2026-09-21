@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHABIR KHAN TRADING BOT</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#ffc82c; --gold-2:#f2b705; --ink:#0c0c0c; --panel:#101010; --chip:#1b1b1b;
+  --line:rgba(255,200,44,.22); --text:#fff5d6; --up:#19e05a; --down:#ff4256; --mute:#9a917a;
+}
+*{box-sizing:border-box}
+html{background:#15130c;min-height:100%}
+html,body{margin:0}
+body{
+  min-height:100vh; color:var(--text);
+  font-family:"Manrope","Segoe UI",system-ui,sans-serif; font-weight:700;
+  background:radial-gradient(900px 500px at 50% -80px,rgba(255,200,44,.22),transparent 70%),#15130c;
+  padding:24px 14px 48px;
+}
+.wrap{max-width:560px;margin:0 auto}
+.logo{
+  width:132px;height:132px;margin:0 auto 22px;border-radius:50%;background:#000;
+  border:3px solid var(--gold);display:grid;place-items:center;text-align:center;
+  box-shadow:0 0 0 6px rgba(255,200,44,.12),0 0 46px rgba(255,200,44,.55),inset 0 0 26px rgba(255,200,44,.25);
+}
+.logo b{display:block;color:var(--gold);font-size:17px;font-weight:800;line-height:1.1}
+.logo i{display:block;width:70px;height:2px;background:var(--gold);margin:7px auto;opacity:.8}
+.logo span{font-size:12px;letter-spacing:.1em;font-weight:800}
+header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.bolt{
+  width:52px;height:52px;border-radius:14px;background:var(--gold);display:grid;place-items:center;
+  box-shadow:0 0 26px rgba(255,200,44,.6);flex:none;
+}
+.bolt svg{width:26px;height:26px}
+h1{margin:0;font-size:22px;color:var(--gold);font-weight:800;flex:1;text-shadow:0 0 18px rgba(255,200,44,.35)}
+.clock{
+  background:#0a0a0a;border:1px solid var(--line);border-radius:12px;padding:9px 12px;
+  font-variant-numeric:tabular-nums;color:var(--gold);font-size:15px;white-space:nowrap;
+}
+.clock::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-right:8px}
+.card{
+  background:linear-gradient(180deg,#141414,#0d0d0d);border:1px solid var(--line);border-radius:22px;
+  padding:20px;margin-bottom:18px;box-shadow:0 0 34px rgba(255,200,44,.12),inset 0 1px 0 rgba(255,200,44,.15);
+}
+label,.lbl{display:block;color:var(--gold);font-size:14px;margin:0 0 10px;font-weight:800}
+select{
+  width:100%;appearance:none;background:#161616 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23ffc82c' stroke-width='2.4'/%3E%3C/svg%3E") no-repeat right 16px center;
+  color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:15px 44px 15px 16px;
+  font:inherit;font-size:16px;
+}
+input{width:100%;background:#161616;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:15px 16px;font:inherit;font-size:16px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.status{margin:14px 0 16px;font-size:14px;display:flex;align-items:center;gap:8px}
+.status::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
+.status.closed{color:#ff5a6a}.status.open{color:var(--up)}
+.durations{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:20px}
+.durations button{
+  background:var(--chip);color:#fff;border:1px solid rgba(255,255,255,.07);border-radius:13px;
+  padding:13px 0;font:inherit;font-size:15px;cursor:pointer;
+}
+.durations button[aria-pressed="true"]{
+  background:var(--gold);color:#3a2b00;border-color:var(--gold);box-shadow:0 0 22px rgba(255,200,44,.7);
+}
+.go{
+  width:100%;border:0;border-radius:16px;padding:19px;cursor:pointer;font:inherit;font-size:17px;
+  letter-spacing:.14em;color:#221800;font-weight:800;
+  background:linear-gradient(180deg,#ffd84d,#f0b400);box-shadow:0 0 30px rgba(255,200,44,.45);
+}
+.go:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.hidden{display:none!important}
+.feed{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0a0a08;margin-bottom:16px}
+.feed .tag{position:absolute;left:10px;top:10px;font-size:12px;background:rgba(0,0,0,.65);border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:#fff;z-index:1}
+.feed .tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-right:6px}
+.feed .tf{position:absolute;right:10px;top:10px;font-size:12px;background:rgba(0,0,0,.65);border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--gold);z-index:1}
+canvas{display:block;width:100%;height:190px}
+.scan{position:absolute;top:0;bottom:0;left:-80px;width:80px;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,200,44,.32));border-right:2px solid rgba(255,200,44,.95);
+  box-shadow:6px 0 22px rgba(255,200,44,.55);animation:sweep 1.5s linear infinite}
+@keyframes sweep{to{left:100%}}
+.feed.done .scan{display:none}
+.head.finished .ring{display:none}
+.legend{position:absolute;left:10px;bottom:8px;font-size:11px;color:var(--mute);z-index:1}
+.legend b{display:inline-block;width:14px;height:3px;border-radius:2px;margin:0 5px 2px 8px;vertical-align:middle}
+.steps{list-style:none;margin:0;padding:0;font-size:14px;color:var(--mute)}
+.steps li{padding:5px 0}
+.steps li.done{color:var(--text)}
+.steps li.done::before{content:"✓ ";color:var(--gold)}
+.steps li.now::before{content:"◌ ";color:var(--gold)}
+.steps li:not(.done):not(.now)::before{content:"· "}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.ring{width:34px;height:34px;border-radius:50%;border:4px solid rgba(255,200,44,.25);border-top-color:var(--gold);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result .dir{text-align:center;font-size:76px;line-height:1;font-weight:800;letter-spacing:.02em;margin:6px 0 4px}
+.result .sub{text-align:center;font-size:14px;color:var(--mute);margin-bottom:18px}
+.dir.UP{color:var(--up);text-shadow:0 0 30px rgba(25,224,90,.55)}
+.dir.DOWN{color:var(--down);text-shadow:0 0 30px rgba(255,66,86,.55)}
+.dir.NONE{color:var(--mute);font-size:38px}
+.rows div{display:flex;justify-content:space-between;gap:12px;background:#151515;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:13px 14px;margin-bottom:8px;font-size:15px}
+.rows span:first-child{color:var(--mute)}
+.note{font-size:12.5px;color:var(--mute);line-height:1.55;margin-top:12px;font-weight:600}
+.credit{text-align:center;color:var(--gold);font-size:16px;font-weight:800;letter-spacing:.06em;margin-top:16px}
+.err{color:#ff8a94;font-size:15px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.ring,.scan{animation:none}}
+@media (max-width:420px){.durations{grid-template-columns:repeat(4,1fr)}h1{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><div><b>SHABIR KHAN</b><i></i><span>TRADING BOT</span></div></div>
+
+  <header>
+    <div class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="#3a2b00" stroke-width="2.4" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+    <h1>Signal Generator</h1>
+    <div class="clock" id="clock">--:--:--</div>
+  </header>
+
+
+  <section class="card hidden" id="keyCard">
+    <label for="keyInput">FREE DATA KEY (one time)</label>
+    <input id="keyInput" type="text" placeholder="Paste your Twelve Data API key" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button class="go" id="saveKey" style="margin-top:14px">SAVE KEY</button>
+    <p class="note">Get it free at twelvedata.com. The key stays only in this browser.</p>
+  </section>
+
+  <section class="card hidden" id="form">
+    <label for="asset">ASSET / PAIR</label>
+    <select id="asset"></select>
+    <div class="status" id="status">Checking market…</div>
+    <div class="lbl">TRADE DURATION</div>
+    <div class="durations" id="durations"></div>
+    <button class="go" id="go" disabled>GENERATE SIGNAL</button>
+    <p class="note" style="text-align:center"><a href="#" id="changeKey" style="color:var(--gold)" onclick="return false">Change API key</a></p>
+  </section>
+
+  <section class="card hidden" id="analysis">
+    <div class="feed">
+      <span class="tag">LIVE FEED</span><span class="tf" id="tf">1M</span>
+      <canvas id="chart"></canvas><div class="scan"></div><div class="legend hidden" id="legend"><b style="background:#ffc82c"></b>Fast trend<b style="background:#5ab0ff"></b>Slow trend</div>
+    </div>
+    <div class="head" id="ahead"><div class="ring"></div><div><div id="atitle" style="color:var(--gold);font-size:17px">Analyzing market…</div></div></div>
+    <ul class="steps" id="steps"></ul>
+  </section>
+
+  <section class="card result hidden" id="result"></section>
+</div>
+
+<script>
+
+const PAIRS = ["EUR/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "USD/JPY", "USD/CAD", "CAD/JPY", "AUD/JPY", "AUD/CAD", "AUD/USD", "GBP/USD", "USD/CHF", "EUR/CHF", "CHF/JPY", "GBP/CAD", "GBP/AUD"];
+// expiry -> [candle interval, candles ahead used to judge a trade]
+const EXP = {"1m":["1min",1],"2m":["1min",2],"3m":["1min",3],
+  "5m":["5min",1],"10m":["5min",2],"15m":["15min",1],"30m":["30min",1],"1h":["1h",1],"4h":["4h",1],"1d":["1day",1]};
+const EXPIRIES = Object.keys(EXP);
+const $ = s => document.querySelector(s);
+let expiry = "1m";
+
+const secs = e => parseInt(e) * {s:1,m:60,h:3600,d:86400}[e.slice(-1)];
+const store = { get:k => { try{return localStorage.getItem(k)}catch(e){return null} }, set:(k,v) => { try{localStorage.setItem(k,v)}catch(e){} }, del:k => { try{localStorage.removeItem(k)}catch(e){} } };
+
+function marketOpen(){           // forex: closed Fri 22:00 UTC -> Sun 22:00 UTC
+  const n = new Date(), wd = n.getUTCDay(), h = n.getUTCHours();   // Sun=0
+  if(wd === 6) return false;
+  if(wd === 5 && h >= 22) return false;
+  if(wd === 0 && h < 22) return false;
+  return true;
+}
+function refreshStatus(){
+  const open = marketOpen(), st = $("#status");
+  st.className = "status " + (open ? "open" : "closed");
+  st.textContent = open ? "Live market OPEN" : "Live market CLOSED (weekend). Opens Sunday 22:00 UTC.";
+  $("#go").disabled = !open || !store.get("td_key");
+}
+function refreshKeyUI(){
+  const has = !!store.get("td_key");
+  $("#keyCard").classList.toggle("hidden", has);
+  $("#form").classList.toggle("hidden", !has);
+  refreshStatus();
+}
+
+const tick = () => $("#clock").textContent = new Date().toLocaleTimeString([], {hour12:false});
+tick(); setInterval(tick, 1000); setInterval(refreshStatus, 60000);
+
+$("#asset").innerHTML = PAIRS.map(p => `<option>${p}</option>`).join("");
+const box = $("#durations");
+EXPIRIES.forEach(e => {
+  const b = document.createElement("button");
+  b.textContent = e; b.setAttribute("aria-pressed", e === expiry);
+  b.onclick = () => { expiry = e; [...box.children].forEach(x => x.setAttribute("aria-pressed", x === b)); };
+  box.appendChild(b);
+});
+$("#saveKey").onclick = () => { const k = $("#keyInput").value.trim(); if(k){ store.set("td_key", k); $("#keyInput").value = ""; refreshKeyUI(); } };
+$("#changeKey").onclick = () => { store.del("td_key"); refreshKeyUI(); };
+
+async function getCandles(pair, interval){
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(pair)}&interval=${interval}&outputsize=400&order=ASC&timezone=UTC&apikey=${store.get("td_key")}`;
+  const j = await (await fetch(url)).json();
+  if(j.status === "error") throw new Error(j.message || "Data provider error");
+  const cs = j.values.map(v => ({o:+v.open, h:+v.high, l:+v.low, c:+v.close}));
+  if(cs.length < 60) throw new Error("Not enough market data right now. Try again in a minute.");
+  return cs.slice(0, -1);   // drop the still-forming candle
+}
+
+const ema = (a, span) => { const k = 2/(span+1), o = [a[0]]; for(let i=1;i<a.length;i++) o.push(a[i]*k + o[i-1]*(1-k)); return o; };
+const wilder = a => { const k = 1/14, o = [a[0]]; for(let i=1;i<a.length;i++) o.push(a[i]*k + o[i-1]*(1-k)); return o; };
+
+function analyze(closes, h){
+  const e9 = ema(closes,9), e21 = ema(closes,21), g = [0], l = [0];
+  for(let i=1;i<closes.length;i++){ const d = closes[i]-closes[i-1]; g.push(Math.max(d,0)); l.push(Math.max(-d,0)); }
+  const ag = wilder(g), al = wilder(l);
+  const rsi = ag.map((x,i) => al[i] === 0 ? (x === 0 ? 50 : 100) : 100 - 100/(1 + x/al[i]));
+  const m12 = ema(closes,12), m26 = ema(closes,26), macd = m12.map((x,i) => x - m26[i]), sig = ema(macd,9);
+  const hist = macd.map((x,i) => x - sig[i]);
+  const score = closes.map((_,i) => Math.sign(e9[i]-e21[i]) + Math.sign(hist[i])
+      + (rsi[i] > 55 ? 1 : rsi[i] < 45 ? -1 : 0) - (rsi[i] > 75 ? 2 : 0) + (rsi[i] < 25 ? 2 : 0));
+  let wins = 0, total = 0;
+  for(let i=30;i<closes.length-h;i++){
+    if(Math.abs(score[i]) >= 2){ total++; if((closes[i+h]-closes[i]) * Math.sign(score[i]) > 0) wins++; }
+  }
+  const n = closes.length-1, s = score[n];
+  return { direction: s >= 2 ? "UP" : s <= -2 ? "DOWN" : "NONE", rsi: +rsi[n].toFixed(1),
+           ema_trend: e9[n] > e21[n] ? "up" : "down", e9: e9.slice(-60), e21: e21.slice(-60), win_rate: total ? +(100*wins/total).toFixed(1) : null, samples: total };
+}
+
+function drawChart(all, r){
+  const cs = all.slice(-60), cv = $("#chart"), dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight; cv.width = W*dpr; cv.height = H*dpr;
+  const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0,0,W,H);
+  const hi = Math.max(...cs.map(c=>c.h)), lo = Math.min(...cs.map(c=>c.l)), pad = 26;
+  const y = v => pad + (hi - v) / (hi - lo || 1) * (H - pad*2), step = W / cs.length;
+  cs.forEach((c,i) => {
+    const x = i*step + step/2, up = c.c >= c.o; g.strokeStyle = g.fillStyle = up ? "#19e05a" : "#ff4256";
+    g.beginPath(); g.moveTo(x, y(c.h)); g.lineTo(x, y(c.l)); g.lineWidth = 1; g.stroke();
+    g.fillRect(x - step*.32, y(Math.max(c.o,c.c)), step*.64, Math.max(2, Math.abs(y(c.o) - y(c.c))));
+  });
+  const last = cs[cs.length-1].c; g.setLineDash([4,4]); g.strokeStyle = "rgba(255,200,44,.5)"; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(0,y(last)); g.lineTo(W,y(last)); g.stroke(); g.setLineDash([]);
+  if(r){
+    [[r.e9,"#ffc82c"],[r.e21,"#5ab0ff"]].forEach(([arr,col]) => {
+      g.beginPath(); g.strokeStyle = col; g.lineWidth = 1.8;
+      arr.forEach((v,i) => { const x = i*step + step/2; i ? g.lineTo(x,y(v)) : g.moveTo(x,y(v)); });
+      g.stroke();
+    });
+  }
+}
+
+const STEPS = ["Connecting to market feed","Fetching live candle data","Scanning price action","Reading market momentum","Confirming trend direction","Verifying against recent history"];
+const setSteps = n => $("#steps").innerHTML = STEPS.map((s,i) => `<li class="${i<n?"done":i===n?"now":""}">${s}</li>`).join("");
+const fmt = d => d.toLocaleTimeString([], {hour12:false});
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function generate(){
+  const btn = $("#go"); btn.disabled = true; btn.textContent = "ANALYZING…";
+  $("#result").classList.add("hidden"); $("#analysis").classList.remove("hidden");
+  $(".feed").classList.remove("done"); $("#ahead").classList.remove("finished"); $("#legend").classList.add("hidden");
+  $("#atitle").textContent = "Analyzing market…"; setSteps(0);
+  const pair = $("#asset").value;
+  const [interval, h] = EXP[expiry];
+  try{
+    if(!marketOpen()) throw new Error("Market is closed on weekends.");
+    await sleep(600); setSteps(1);
+    const cs = await getCandles(pair, interval); $("#tf").textContent = interval.toUpperCase(); drawChart(cs); setSteps(2);
+    await sleep(1100); setSteps(3);
+    const r = analyze(cs.map(c => c.c), h);
+    await sleep(1100); setSteps(4);
+    await sleep(1100); drawChart(cs, r); $("#legend").classList.remove("hidden"); setSteps(5);
+    await sleep(1100); setSteps(6);
+    $(".feed").classList.add("done"); $("#ahead").classList.add("finished"); $("#atitle").textContent = "Analysis complete · " + pair;
+    const now = new Date();
+    render({ ...r, pair, expiry, entry: now, exp: new Date(now.getTime() + secs(expiry)*1000), low_res: secs(expiry) < 60 });
+  }catch(e){
+    $("#analysis").classList.add("hidden");
+    $("#result").innerHTML = `<div class="err">${e.message}</div>`; $("#result").classList.remove("hidden");
+  }finally{
+    btn.textContent = "GENERATE SIGNAL"; refreshStatus();
+  }
+}
+
+function render(s){
+  const label = {UP:"UP",DOWN:"DOWN",NONE:"NO TRADE"}[s.direction];
+  const sub = {UP:"BUY / CALL ▲",DOWN:"SELL / PUT ▼",NONE:"Indicators disagree. Skip this one."}[s.direction];
+  const wr = s.win_rate === null ? "Not enough data" : `${s.win_rate}% (last ${s.samples} signals)`;
+  $("#result").innerHTML = `
+    <div class="dir ${s.direction}">${label}</div><div class="sub">${sub}</div>
+    <div class="rows">
+      <div><span>Asset</span><span>${s.pair}</span></div>
+      <div><span>Duration</span><span>${s.expiry}</span></div>
+      <div><span>Win rate</span><span>${wr}</span></div>
+      <div><span>Entry time</span><span>${fmt(s.entry)}</span></div>
+      <div><span>Expiry time</span><span>${fmt(s.exp)}</span></div>
+      <div><span>Strength · Trend</span><span>${s.rsi} · ${s.ema_trend}</span></div>
+    </div>
+    <p class="note credit">Sheryar Wazir</p>
+    <p class="note" style="text-align:center;margin-top:4px">Trading involves risk.</p>`;
+  $("#result").classList.remove("hidden");
+}
+$("#go").onclick = generate;
+refreshKeyUI();
+</script>
+
+</body>
+</html>
